@@ -117,11 +117,10 @@ else:
 SUDO_USERS.add(OWNER_ID)
 SUDO_USERS.add(20516707)
 
-# Initialize updater and dispatcher
-updater = tg.Updater(TOKEN, workers=WORKERS)
-dispatcher = updater.dispatcher
+# Create the application instance using the new API (Application replaces Updater)
+application = tg.Application.builder().token(TOKEN).build()
 
-# Converting sets to lists for easier handling
+# Convert sets to lists for easier handling
 SUDO_USERS = list(SUDO_USERS)
 WHITELIST_USERS = list(WHITELIST_USERS)
 SUPPORT_USERS = list(SUPPORT_USERS)
@@ -133,3 +132,13 @@ from tg_bot.modules.helper_funcs.handlers import CustomCommandHandler, CustomReg
 tg.RegexHandler = CustomRegexHandler
 if ALLOW_EXCL:
     tg.CommandHandler = CustomCommandHandler
+
+# Example of an async function for the /start command
+async def start(update, context):
+    await update.message.reply_text('Hello! I am your bot.')
+
+# Add the start command handler
+application.add_handler(tg.CommandHandler("start", start))
+
+# Run the bot (this replaces updater.start_polling() from the old API)
+application.run_polling(allowed_updates=tg.Update.ALL_UPDATES)
